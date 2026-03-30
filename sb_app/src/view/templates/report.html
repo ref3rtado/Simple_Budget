@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Transactions Report{% endblock %}
+
+{% block body_class %}page-dashboard{% endblock %}
+{% block card_class %}dashboard-page{% endblock %}
+
+{% block content %}
+
+<div class="cat-page-header">
+    <div class="cat-page-title-row">
+        <h1 style="margin-bottom: 0;">Transactions</h1>
+        <a href="/dashboard" class="btn-secondary">← Dashboard</a>
+    </div>
+</div>
+
+{# ── Filter bar ── #}
+<form id="report-filter-form"
+      hx-post="/report/filter"
+      hx-target="#report-rows"
+      hx-swap="innerHTML"
+      hx-trigger="submit">
+
+    <div class="cat-table-header" id="filter-parent-container">
+        {# TODO: Change style #}
+        {# Date filter #}
+        <div class="cat-filter-dropdown filter-container" id="date-filter-container">
+            <button type="button" class="btn-secondary filter-button" id="filter-btn-date" onclick="toggleDropdown('date-panel')">
+                Filter: Date
+            </button>
+            {# TODO: Change style #}
+            {# Drop down menu #}
+            <div id="date-panel" class="cat-checkbox-panel filter-drop-menu hidden">
+                <label class="cat-checkbox-label">
+                    <input type="radio" name="date_filter" value="7"> Last 7 Days
+                </label>
+                <label class="cat-checkbox-label">
+                    <input type="radio" name="date_filter" value="30"> Last 30 Days
+                </label>
+            </div>
+        </div>
+
+        {# Category filter #}
+        <div class="cat-filter-dropdown filter-container" id="cat-filter-container">
+            <button type="button" class="btn-secondary filter-button" id="filter-btn-cat" onclick="toggleDropdown('cat-checkbox-panel')">
+                Filter: Category
+            </button>
+            {# Drop down menu #}
+            <div id="cat-checkbox-panel" class="cat-checkbox-panel filter-drop-menu hidden">
+                {% for b in budgets %}
+                <label class="cat-checkbox-label">
+                    <input type="checkbox" name="category_ids" value="{{ b.id }}">
+                    {{ b.budget_name | capitalize }}
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# Cost filter #}
+        <div class="filter-container" id="cost-filter-container">
+            <button type="button" class="btn-secondary filter-button" id="filter-btn-cost" onclick="toggleDropdown('cost-panel')">
+                Filter: Cost
+            </button>
+            {# Drop down menu #}
+            <div id="cost-panel" class="filter-drop-menu hidden">
+                <label class="cat-checkbox-label">
+                    <input type="radio" name="cost_filter" value=">100"> Cost &gt; $100
+                </label>
+                <label class="cat-checkbox-label">
+                    <input type="radio" name="cost_filter" value=">50"> Cost &gt; $50
+                </label>
+                <label class="cat-checkbox-label">
+                    <input type="radio" name="cost_filter" value="&lt;50"> Cost &lt; $50
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-secondary filter" id="btn-generate">Generate</button>
+
+        <button type="reset" class="btn-secondary"
+                onclick="setTimeout(() => closeAllDropdowns(), 0)">
+            Clear
+        </button>
+
+    </div>
+</form>
+
+{# ── Transaction table ── #}
+<div class="cat-table-wrapper">
+    <div class="cat-table-header">
+        <span class="cat-col-name">Category</span>
+        <span class="cat-col-name">Cost</span>
+        <span class="cat-col-name">Description</span>
+        <span class="cat-col-name">Date</span>
+        <span class="cat-col-name">Report date</span>
+    </div>
+
+    <div id="report-rows"
+         hx-swap="innerHTML">
+        <div class="cat-loading">Select filters to generate a report.</div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function toggleDropdown(id) {
+        const target = document.getElementById(id);
+        const isOpen = !target.classList.contains('hidden');
+        closeAllDropdowns();
+        if (!isOpen) target.classList.remove('hidden');
+    }
+
+    function closeAllDropdowns() {
+        document.querySelectorAll('.filter-drop-menu').forEach(p => p.classList.add('hidden'));
+    }
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.filter-container')) {
+            closeAllDropdowns();
+        }
+    });
+</script>
+{% endblock %}

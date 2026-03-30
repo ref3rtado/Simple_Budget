@@ -1,0 +1,40 @@
+{# ============================================================
+   FRAGMENT: nav_actions.html
+   Section C — Navigation & Session Actions
+ 
+   C1: Log Out — ends the user session, redirects to /
+   C2: View/Edit Budget Categories — navigates to /categories
+   C3: Generate Reports — navigates to /generate_report
+   ============================================================ #}
+ 
+<nav id="nav-actions-section" class="nav-actions-column">
+ 
+    {# C1: Log out #}
+    <button
+        id="btn-logout"
+        class="btn-secondary"
+        hx-post="/user/logout"
+        hx-swap="none">
+        Log Out
+    </button>
+ 
+    {# C2: Categories page — TODO: build /categories route + template #}
+    <a href="/categories" class="btn-secondary" id="link-categories">
+        View/Edit Budget Categories
+    </a>
+ 
+    {# C3: Reports page — TODO: build /generate_report route + template #}
+    <a href="/report" class="btn-secondary" id="link-reports">
+        Generate Reports
+    </a>
+ 
+</nav>
+ 
+<script>
+    // C1: Redirect to login after successful logout
+    document.body.addEventListener('htmx:afterRequest', function (evt) {
+        if (evt.detail.elt.id === 'btn-logout' && evt.detail.successful) {
+            window.location.href = '/';
+        }
+    });
+</script>

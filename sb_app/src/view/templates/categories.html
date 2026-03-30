@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Budget Categories{% endblock %}
+
+{% block body_class %}page-dashboard{% endblock %}
+{% block card_class %}dashboard-page{% endblock %}
+
+{% block content %}
+
+{# ── Page header ── #}
+<div class="cat-page-header">
+    <div class="cat-page-title-row">
+        <h1 style="margin-bottom: 0;">Budget categories</h1>
+        <a href="/dashboard" class="btn-secondary">← Back to dashboard</a>
+    </div>
+
+    {# Surplus bar — initially empty, populated on first list load via oob swap ── #}
+    <div id="surplus-bar" class="surplus-bar hidden">
+        <span class="surplus-label">Unallocated surplus</span>
+        <span class="surplus-value">—</span>
+    </div>
+
+    <div id="cat-message" class="message hidden"></div>
+</div>
+
+{# ── Add category panel (collapsed by default) ── #}
+<div id="add-panel" class="cat-add-panel hidden">
+    <form hx-post="/categories/add"
+          hx-target="#cat-list"
+          hx-swap="innerHTML"
+          hx-on::after-request="handleAddResponse(event)">
+
+        <div class="cat-add-row">
+            <div class="form-group cat-add-name">
+                <label for="add-name">Category name <span class="required">*</span></label>
+                <input type="text" id="add-name" name="budget_name"
+                       minlength="3" maxlength="25"
+                       pattern="^[a-zA-Z0-9 \-_]+$"
+                       placeholder="e.g. Groceries" required>
+            </div>
+            <div class="form-group cat-add-amount">
+                <label for="add-amount">Budget amount</label>
+                <input type="number" id="add-amount" name="budget_amount"
+                       min="0" max="99999999.99" step="0.01"
+                       placeholder="0.00"
+                       oninput="updateAddHint(this.value)">
+            </div>
+            <div class="cat-add-actions">
+                <button type="submit" class="btn-primary cat-add-save">Save</button>
+                <button type="button" class="btn-secondary cat-add-cancel"
+                        onclick="closeAddPanel()">Cancel</button>
+            </div>
+        </div>
+        <p id="add-hint" class="cat-add-hint hidden"></p>
+    </form>
+</div>
+
+{# ── Category table ── #}
+<div class="cat-table-wrapper">
+    <div class="cat-table-header">
+        <span class="cat-col-name">Category</span>
+        <span class="cat-col-amount">Budget</span>
+        <span class="cat-col-actions">
+            <button class="btn-primary cat-btn-add"
+                    onclick="toggleAddPanel()">+ Add category</button>
+        </span>
+    </div>
+
+    {# HTMX loads and swaps this on page load; all mutations re-swap it ── #}
+    <div id="cat-list"
+         hx-get="/categories/list"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+        <div class="cat-loading">Loading categories...</div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    // Add-panel toggle 
+
+    function toggleAddPanel() {
+        document.getElementById('add-panel').classList.toggle('hidden');
+    }
+
+    function closeAddPanel() {
+        document.getElementById('add-panel').classList.add('hidden');
+        document.getElementById('add-amount').value = '';
+        document.getElementById('add-name').value = '';
+        document.getElementById('add-hint').classList.add('hidden');
+    }
+
+    function getSurplusFromDOM() {
+        const el = document.querySelector('#surplus-bar .surplus-value');
+        if (!el) return 0;
+        return parseFloat(el.textContent.replace(/[$,]/g, '')) || 0;
+    }
+
+    function updateAddHint(rawVal) {
+        const hint    = document.getElementById('add-hint');
+        const val     = parseFloat(rawVal) || 0;
+        const surplus = getSurplusFromDOM();
+
+        if (val <= 0) { hint.classList.add('hidden'); return; }
+
+        hint.classList.remove('hidden', 'cat-hint-ok', 'cat-hint-warn');
+        if (val <= surplus) {
+            hint.textContent = `This will reduce your surplus to $${(surplus - val).toFixed(2)}.`;
+            hint.classList.add('cat-hint-ok');
+        } else {
+            const increase = val - surplus;
+            hint.textContent = `No surplus to cover this. Total budget will increase by $${increase.toFixed(2)}.`;
+            hint.classList.add('cat-hint-warn');
+        }
+    }
+
+    function handleAddResponse(evt) {
+        if (evt.detail.successful) {
+            closeAddPanel();
+        }
+    }
+
+    // Row expand / collapse 
+
+    let openPanelId = null;
+
+    function toggleEditPanel(budgetId) {
+        const panel = document.getElementById('panel-' + budgetId);
+        if (!panel) return;
+
+        if (openPanelId && openPanelId !== budgetId) {
+            const prev = document.getElementById('panel-' + openPanelId);
+            if (prev) {
+                prev.style.display = 'none';
+                prev.closest('.cat-row').classList.remove('cat-row-open');
+            }
+        }
+
+        const isOpen = panel.style.display !== 'none';
+        panel.style.display = isOpen ? 'none' : 'block';
+        panel.closest('.cat-row').classList.toggle('cat-row-open', !isOpen);
+        openPanelId = isOpen ? null : budgetId;
+    }
+
+    document.getElementById('cat-list').addEventListener('click', function (e) {
+        const row = e.target.closest('.cat-row-main');
+        if (!row) return;
+        const budgetId = parseInt(row.dataset.budgetId, 10);
+        toggleEditPanel(budgetId);
+    });
+
+    // Reset open panel tracker whenever HTMX re-renders the list
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (evt.detail.target && evt.detail.target.id === 'cat-list') {
+            openPanelId = null;
+        }
+    });
+</script>
+{% endblock %}

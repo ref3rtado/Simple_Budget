@@ -1,0 +1,205 @@
+{# ============================================================
+   FRAGMENT: add_transaction.html
+   Section B — Add Transaction Form
+
+   B1: Cancel button — clears all B fields.
+   B2: Amount input — "$" is hardcoded, user enters decimal value.
+   B3: Budget dropdown — populated via HTMX query of budget table
+       filtered by user_id. Includes a default "General/Overall" option.
+   B4: Optional description — validated to strip special characters.
+   B5: "Today" button — sets B6 to the current date (JS, no server call).
+   B6: Date input (MM/DD/YYYY) — manual entry or filled by B5 / B7.
+   B7: Calendar date picker — appears when B6 is focused; clicking a
+       day fills B6.
+   B8: Save button — disabled until B2, B3, and B6 are all filled.
+       Posts to /transactions/add via HTMX.
+   ============================================================ #}
+
+<section id="add-transaction-section" class="add-transaction-section">
+    <h2>Add a Transaction:</h2>
+
+    <div id="transaction-message" class="message hidden"></div>
+
+    <form id="transaction-form"
+          hx-post="/transactions/add"
+          hx-ext="json-enc"
+          hx-target="#data-viz-section"
+          hx-swap="outerHTML">
+
+        <div class="txn-form-row">
+
+            {# B1: Cancel — red X square, clears all fields #}
+            <button type="button" id="btn-cancel-txn">x</button>
+
+            {# B2: Amount #}
+            <div class="form-group txn-amount-group">
+                <label for="txn-amount">Amount <span class="required">*</span></label>
+                <div class="input-prefix-wrapper">
+                    <input
+                        type="number"
+                        id="txn-amount"
+                        name="amount"
+                        min="0.01"
+                        max="99999999.99"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+                </div>
+                <span class="field-error" id="err-cost"></span>
+            </div>
+
+            {# B3: Budget category dropdown — populated by HTMX on load.
+                 hx-get queries /user/budgets and swaps in <option> elements.
+                 The static "General/Overall" option is the fallback. #}
+            <div class="form-group txn-budget-group">
+                <label for="txn-budget">Category <span class="required">*</span></label>
+                <select
+                    id="txn-budget"
+                    name="category_id"
+                    hx-get="/categories/dropdown"
+                    hx-trigger="load"
+                    hx-target="#txn-budget"
+                    hx-swap="innerHTML"
+                    hx-params="none">
+                </select>
+                <span class="field-error" id="err-budget-name"></span>
+            </div>
+
+            {# B4: Optional description — pattern restricts special characters #}
+            <div class="form-group txn-desc-group">
+                <label for="txn-desc">Description</label>
+                <input
+                    type="text"
+                    id="txn-desc"
+                    name="description"
+                    maxlength="100"
+                    pattern="^[a-zA-Z0-9 .,'\-]*$"
+                    placeholder="Optional description"
+                >
+                <span class="field-error" id="err-description"></span>
+            </div>
+
+            {# B5 + B6 + B7: Date group #}
+            <div class="form-group txn-date-group">
+                <label for="txn-date">Date <span class="required">*</span></label>
+                <div class="date-input-row">
+
+                    {# B5: Today shortcut button #}
+                    <button type="button" id="btn-today" class="btn-secondary">Today</button>
+
+                    <span class="or-text">OR</span>
+
+                    {# B6: Date input — filled by B5 or B7 (browser-native calendar) #}
+                    <input
+                        type="date"
+                        id="txn-date"
+                        name="txn_date"
+                        required
+                    >
+
+                </div>
+                <span class="field-error" id="err-transaction-date"></span>
+            </div>
+
+            {# B8: DONE — disabled until B2, B3, B6 are filled #}
+            <button
+                type="submit"
+                id="btn-save-txn"
+                class="btn-primary"
+                disabled>
+                ADD
+            </button>
+
+        </div>
+
+    </form>
+
+</section>
+
+<script>
+    (function () {
+        const form    = document.getElementById('transaction-form');
+        const amount  = document.getElementById('txn-amount');
+        const budget  = document.getElementById('txn-budget');
+        const date    = document.getElementById('txn-date');
+        const saveBtn = document.getElementById('btn-save-txn');
+        const cancelBtn = document.getElementById('btn-cancel-txn');
+        const todayBtn  = document.getElementById('btn-today');
+
+        // B8: Enable Save only when all required fields have values
+        function checkFormReady() {
+            const ready = amount.value.trim() !== ''
+                       && budget.value !== ''
+                       && date.value.trim() !== '';
+            saveBtn.disabled = !ready;
+        }
+        [amount, budget, date].forEach(el => el.addEventListener('input', checkFormReady));
+        // Re-check after HTMX populates the budget dropdown
+        document.body.addEventListener('htmx:afterSwap', checkFormReady);
+
+        // Re-apply threshold colors after every HTMX settle (swap + settle = complete).
+        // The inline script in data_viz.html fires during the swap phase, but HTMX's
+        // settle cycle can wipe inline styles before they stick. Running here guarantees
+        // colors are applied after all HTMX processing is finished.
+        document.body.addEventListener('htmx:afterSettle', function () {
+            document.querySelectorAll('.data-viz-child').forEach(function (container) {
+                var amountEl  = container.querySelector('.viz-amount-value');
+                var remainEl  = container.querySelector('.viz-remain-value');
+                if (!amountEl || !remainEl) return;
+                var amount    = parseFloat(amountEl.textContent);
+                var remaining = parseFloat(remainEl.textContent);
+                var utilization = (amount - remaining) / amount;
+                if (remaining < 0 || utilization >= 0.99) {
+                    container.style.backgroundColor = '#fca5a5';
+                } else if (utilization >= 0.75) {
+                    container.style.backgroundColor = '#fde68a';
+                }
+            });
+        });
+
+        // B5: Fill date input with today's date
+        todayBtn.addEventListener('click', function () {
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+            date.value = today;
+            checkFormReady();
+        });
+
+        // B1: Clear all fields and re-disable Save
+        cancelBtn.addEventListener('click', function () {
+            form.reset();
+            saveBtn.disabled = true;
+        });
+
+        // Debugging rejected request
+        document.body.addEventListener('htmx:beforeRequest', function(evt) {
+        // evt.detail.requestConfig contains the AJAX config
+            console.log("Sending JSON Request:", JSON.stringify(evt.detail.requestConfig.parameters));
+            });
+
+
+        // Response handling
+        document.body.addEventListener('htmx:afterRequest', function (evt) {
+            if (evt.detail.elt.id !== 'transaction-form') return;
+            const msg = document.getElementById('transaction-message');
+            msg.classList.remove('hidden', 'success', 'error');
+            if (evt.detail.successful) {
+                msg.textContent = 'Transaction saved.';
+                msg.classList.add('success');
+                form.reset();
+                saveBtn.disabled = true;
+                setTimeout(function() {
+                    msg.classList.add('hidden')
+                }, 2500);
+            } else {
+                const body = JSON.parse(evt.detail.xhr.responseText || '{}');
+                const detail = body.detail;
+                msg.textContent = Array.isArray(detail)
+                    ? detail.map(e => e.msg.replace(/^Value error,\s*/i, '')).join(' ')
+                    : detail || 'Something went wrong.';
+                msg.classList.add('error');
+            }
+            msg.classList.remove('hidden');
+        });
+    })();
+</script>

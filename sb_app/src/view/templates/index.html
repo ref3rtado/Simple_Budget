@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block extra_head %}
+    <script src="https://unpkg.com/htmx-ext-json-enc@2.0.1/json-enc.js" defer></script>
+{% endblock %}
+
+{% block content %}
+    <h1>SimpleBudget</h1>
+    <p>Anonymous online budgetting.</p><br>
+
+    <div id="login-message" class="message hidden"></div>
+
+    <form id="login-form"
+          hx-post="/user/login"
+          hx-ext="json-enc"
+          hx-swap="none">
+
+        <div class="form-group">
+            <label for="username">Username <span class="required">*</span></label>
+            <input
+                type="text"
+                id="username"
+                name="name"
+                minlength="3"
+                maxlength="24"
+                required
+                placeholder="Enter your username"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password <span class="required">*</span></label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+            >
+        </div>
+
+        <button type="submit" class="btn-primary">Log In</button>
+    </form>
+
+    <hr>
+    <p>New user with an invite code? <a href="/new_user">Create new account</a></p>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.body.addEventListener('htmx:afterRequest', function (evt) {
+            if (evt.detail.elt.id === 'login-form') {
+                const msg = document.getElementById('login-message');
+                msg.classList.remove('hidden', 'success', 'error');
+                if (!evt.detail.successful) {
+                    const body = JSON.parse(evt.detail.xhr.responseText || '{}');
+                    const detail = body.detail;
+                    msg.textContent = Array.isArray(detail)
+                        ? detail.map(e => e.msg.replace(/^Value error,\s*/i, '')).join(' ')
+                        : detail || 'Login failed. Please check your credentials.';
+                    msg.classList.add('error');
+                    msg.classList.remove('hidden');
+                }
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Home Dashboard{% endblock %}
+
+{% block body_class %}page-dashboard{% endblock %}
+{% block card_class %}dashboard-page{% endblock %}
+
+{% block extra_head %}
+    <script src="https://unpkg.com/htmx-ext-json-enc@2.0.1/json-enc.js" defer></script>
+{% endblock %}
+
+{% block content %}
+
+{% if new_user %}
+    {% include "fragments/welcome_card.html" %}
+{% endif %}
+
+<div class="dashboard-top">
+    {% include "fragments/data_viz.html" %}
+    {% include "fragments/nav_actions.html" %}
+</div>
+
+{% include "fragments/add_transaction.html" %}
+
+{% endblock %}

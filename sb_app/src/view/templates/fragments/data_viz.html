@@ -1,0 +1,75 @@
+{# ============================================================
+   FRAGMENT: data_viz.html
+   Section A — Data Visualization Container
+ 
+   A1: Outer container for chart/stats widgets (placeholder).
+   ============================================================ #}
+ 
+<section id="data-viz-section" hx-swap="outerHTML">
+
+    <div id="data-viz-container" class="data-viz-container">
+        {% for budget in budgets%}
+        {% set is_overall = budget.budget_name == "overall" %} 
+        {% if is_overall %}
+        <div id="overall-budget-container" class="data-viz-child">
+            <h2 class="viz-budget-title">Overall</h2>
+            <h3 class="viz-bold-text">Amount: 
+                <!--Placeholder values, sub in existing categories-->
+                <span class="viz-dollar">$</span><span class="viz-value viz-amount-value">{{budget.budget_amount}}</span></span></h3>
+            <h3 class="viz-bold-text">Remaining:
+                <span class="viz-dollar">$</span><span class="viz-value viz-remain-value">{{budget.budget_remaining}}</span>
+            </h3>
+        </div>
+        {% endif %}
+        {% endfor %}
+        <div id="sub-budget-container">
+            {% for budget in budgets%}
+            {% set is_overall = budget.budget_name == "overall" %} 
+            {% if not is_overall %}
+            <div id="sub-budget-child" class="data-viz-child"> 
+                <!--Placeholder values, sub in existing categories-->
+                <h3 class="viz-sub-budget-title">{{budget.budget_name}}
+                    <p class="viz-sub-bold-text">Amount: 
+                        <span class="viz-sub-dollar">$</span><span class="viz-sub-value viz-amount-value">{{budget.budget_amount}}</span></span>
+                    </p>
+                    <p class="viz-sub-bold-text">Remaining: 
+                        <span class="viz-sub-dollar">$</span><span class="viz-sub-value viz-remain-value">{{budget.budget_remaining}}</span></span>
+                    </p>
+                    </h3>     
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        
+        <!--
+        <div id="data-viz-placeholder" class="data-viz-placeholder">
+            <p style="visibility: hidden;">DASHBOARD COMING SOON</p>
+        </div>
+        -->
+
+ 
+    </div>
+ 
+</section>
+<script>
+    (function() {
+           //TODO: Double check  ratios
+        function setBackgroundColor(container, amount, remaining) {
+            const utilization = (amount - remaining) / amount;
+            if(remaining < 0 || utilization >= 0.99 ){
+                container.style.backgroundColor = '#fca5a5';
+            }
+            else if(utilization >= 0.75){
+                container.style.backgroundColor = '#fde68a';
+            }
+        }
+
+    document.querySelectorAll('.data-viz-child').forEach(function(container) {
+    const amount    = parseFloat(container.querySelector('.viz-amount-value').textContent);
+    const remaining = parseFloat(container.querySelector('.viz-remain-value').textContent);
+    setBackgroundColor(container, amount, remaining);
+    });
+})();
+
+</script>

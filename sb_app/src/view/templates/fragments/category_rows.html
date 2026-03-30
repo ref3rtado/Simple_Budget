@@ -1,0 +1,139 @@
+{# ============================================================
+   FRAGMENT: category_rows.html
+   Renders the full category list and surplus bar.
+   Returned by every /categories/* mutation endpoint so HTMX
+   can swap both targets in a single response. 
+
+   Expected context:
+     budgets  — list[Budget ORM rows], overall first
+     surplus  — float, pre-calculated server-side
+        ============================================================ #}
+
+{# ── Out-of-band swap: updates surplus bar without a second request ── #}
+<div id="surplus-bar"
+     class="surplus-bar{% if surplus < 0 %} surplus-bar-warning{% endif %}"
+     hx-swap-oob="true">
+    {% if surplus < 0 %}
+        <span class="surplus-label">Over budget</span>
+        <span class="surplus-value">-${{ "%.2f"|format(surplus * -1) }}</span>
+    {% else %}
+        <span class="surplus-label">Unallocated surplus</span>
+        <span class="surplus-value">${{ "%.2f"|format(surplus) }}</span>
+    {% endif %}
+</div>
+
+{# ── Category rows ── #}
+{% for budget in budgets %}
+
+{% set is_overall = budget.budget_name == "overall" %}
+
+<div class="cat-row{% if is_overall %} cat-row-pinned{% endif %}"
+     data-id="{{ budget.id }}">
+
+    {# ── Row summary (click to expand) ── #}
+    <div class="cat-row-main" data-budget-id="{{ budget.id }}">
+        <span class="cat-col-name">
+            {{ budget.budget_name | capitalize }}
+            {% if is_overall %}
+                <span class="cat-badge-locked">locked</span>
+            {% endif %}
+        </span>
+        <span class="cat-col-amount">${{ "%.2f"|format(budget.budget_amount) }}</span>
+        <span class="cat-col-actions">
+            {% if is_overall %}
+                <span class="cat-cannot-delete">cannot delete</span>
+            {% else %}
+                {# Quick-delete ── #}
+                <form hx-post="/categories/delete"
+                      hx-target="#cat-list"
+                      hx-swap="innerHTML"
+                      style="display:inline;"
+                      onclick="event.stopPropagation()">
+                    <input type="hidden" name="budget_id" value="{{ budget.id }}">
+                    <button type="submit" class="cat-quick-delete" title="Delete category">✕</button>
+                </form>
+            {% endif %}
+        </span>
+    </div>
+
+    {# ── Inline edit panel (hidden by default, toggled by JS) ── #}
+    <div class="cat-edit-panel" id="panel-{{ budget.id }}" style="display:none;">
+
+        <div class="cat-edit-row">
+
+            {# Rename — hidden for overall ── #}
+            {% if not is_overall %}
+            <form hx-post="/categories/update"
+                  hx-target="#cat-list"
+                  hx-swap="innerHTML">
+                <input type="hidden" name="budget_id" value="{{ budget.id }}">
+                <div class="form-group cat-edit-name-group">
+                    <label>Rename</label>
+                    <input type="text" name="budget_name"
+                           value="{{ budget.budget_name }}"
+                           minlength="3" maxlength="25"
+                           pattern="^[a-zA-Z0-9 \-_]+$">
+                </div>
+                <button type="submit" class="btn-secondary cat-edit-save-btn">Save name</button>
+            </form>
+
+            <div class="cat-edit-divider"></div>
+            {% endif %}
+
+            {# Amount ── #}
+            <form hx-post="/categories/update"
+                  hx-target="#cat-list"
+                  hx-swap="innerHTML">
+                <input type="hidden" name="budget_id" value="{{ budget.id }}">
+                <div class="form-group cat-edit-amount-group">
+                    <label>Amount</label>
+                    <input type="number" name="budget_amount"
+                           value="{{ "%.2f"|format(budget.budget_amount) }}"
+                           min="0" max="99999999.99" step="0.01">
+                </div>
+                <button type="submit" class="btn-secondary cat-edit-save-btn">Save amount</button>
+            </form>
+
+            <div class="cat-edit-divider"></div>
+
+            {# Maximize ── #}
+            <form hx-post="/categories/maximize"
+                  hx-target="#cat-list"
+                  hx-swap="innerHTML">
+                <input type="hidden" name="budget_id" value="{{ budget.id }}">
+                <button type="submit"
+                        class="btn-secondary cat-edit-maximize-btn"
+                        {% if surplus <= 0 %}disabled{% endif %}>
+                    {% if surplus > 0 %}
+                        Maximize (+${{ "%.2f"|format(surplus) }})
+                    {% else %}
+                        Maximize (no surplus)
+                    {% endif %}
+                </button>
+            </form>
+
+            {# Clear ── #}
+            <form hx-post="/categories/update"
+                  hx-target="#cat-list"
+                  hx-swap="innerHTML">
+                <input type="hidden" name="budget_id" value="{{ budget.id }}">
+                <input type="hidden" name="budget_amount" value="0.00">
+                <button type="submit" class="btn-secondary cat-edit-clear-btn">Clear ($0.00)</button>
+            </form>
+
+            {# Delete — hidden for overall ── #}
+            {% if not is_overall %}
+            <div class="cat-edit-divider"></div>
+            <form hx-post="/categories/delete"
+                  hx-target="#cat-list"
+                  hx-swap="innerHTML">
+                <input type="hidden" name="budget_id" value="{{ budget.id }}">
+                <button type="submit" class="btn-secondary cat-edit-delete-btn cat-btn-danger">Delete</button>
+            </form>
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+{% endfor %}
