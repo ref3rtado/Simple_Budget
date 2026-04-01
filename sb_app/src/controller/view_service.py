@@ -4,6 +4,10 @@ from fastapi.templating import Jinja2Templates
 from src.model.database import get_db
 from src.model import crud
 from sqlalchemy.orm import Session
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 router = APIRouter(tags=["views"])
@@ -32,12 +36,22 @@ def new_user_page(request: Request):
 # The injected depenency checks if user previously authorized. If they manually
 # entered {url..}/dashboard, it will redirect to the login page.
 @router.get("/dashboard0", response_class=HTMLResponse)
-def get_new_dashboard(request: Request, auth=Depends(require_auth)):
+def get_new_dashboard(
+    request: Request,
+    auth=Depends(require_auth),
+    db: Session = Depends(get_db),
+    user_id: str = Cookie(default=None)
+):
     if isinstance(auth, RedirectResponse):
         return auth
+    is_temp_user = False
+    if user_id:
+        user = crud.get_user_by_id(int(user_id), db)
+        if user and user.invite_code == os.getenv("DEV-INVITE-CODE"):
+            is_temp_user = True
     return templates.TemplateResponse(
         "dashboard.html",
-        {"request": request, "new_user": True}
+        {"request": request, "new_user": True, "is_temp_user": is_temp_user}
         )
 
 @router.get("/dashboard", response_class=HTMLResponse)

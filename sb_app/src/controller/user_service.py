@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, Response, HTTPException, Request
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Depends, Response, HTTPException, Request, Cookie
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 from src.model.database import get_db
@@ -8,6 +8,10 @@ from src.model.schema import BudgetInit, BudgetNew, BudgetUpdate, BudgetResponse
 from src.model.schema import KeyResponse, KeyValidate
 from src.model import crud
 import json
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 router = APIRouter(prefix="/user", tags=["u_service"])
 
@@ -32,8 +36,23 @@ def check_invite(key: KeyValidate, response: Response, db: Session = Depends(get
     result = crud.check_invite_code(key, db)
     if not result.isValid:
         raise HTTPException(status_code=400, detail="Invalid key")
+    # Dev invite code: skip account creation and auto-create a temp user instead.
+    if key.invite_key == os.getenv("DEV-INVITE-CODE"):
+        response.headers["HX-Redirect"] = "/user/create_temp_user"
+        return result
     response.headers["HX-Trigger"] = json.dumps({"keyValid": {"invite_key": key.invite_key}})
     return result
+
+
+@router.get("/create_temp_user")
+def create_temp_user(db: Session = Depends(get_db)):
+    """Auto-create a temporary demo account and redirect straight to the dashboard."""
+    user = crud.add_temp_user(db)
+    default_budget = BudgetInit(user_id=user.id)
+    crud.add_budget(default_budget, db)
+    redirect = RedirectResponse(url="/dashboard0", status_code=302)
+    redirect.set_cookie(key="user_id", value=str(user.id), httponly=True)
+    return redirect
 
 @router.post("/login", response_model=UserResponse)
 def login_user(user: UserLogin, response: Response, db: Session = Depends(get_db)):
@@ -46,7 +65,13 @@ def login_user(user: UserLogin, response: Response, db: Session = Depends(get_db
 
 
 @router.post("/logout", response_model=None)
-def logout_user(response: Response):
+def logout_user(response: Response, db: Session = Depends(get_db), user_id: str = Cookie(default=None)):
+    # If the active user is a temp/demo account, delete them before clearing the cookie.
+    if user_id:
+        dev_code = os.getenv("DEV-INVITE-CODE")
+        user = crud.get_user_by_id(int(user_id), db)
+        if user and user.invite_code == dev_code:
+            crud.delete_user(int(user_id), db)
     response.delete_cookie(key="user_id")
     response.headers["HX-Redirect"] = "/"
     return None

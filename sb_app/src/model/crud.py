@@ -26,6 +26,45 @@ DELETE ==  db.delete(row) | commit
 ##    USER    ##
 ################
 
+def delete_user(user_id: int, db: Session) -> None:
+    """Hard-delete a user by PK. Cascades remove their budgets and transactions."""
+    row = db.execute(select(User).where(User.id == user_id)).scalar_one_or_none()
+    if row:
+        db.delete(row)
+        db.commit()
+
+
+def get_user_by_id(user_id: int, db: Session) -> User | None:
+    """Return a User row by PK, or None if not found."""
+    return db.execute(select(User).where(User.id == user_id)).scalar_one_or_none()
+
+
+def add_temp_user(db: Session) -> User:
+    """Create a temporary demo user with an auto-incremented name (tempuser1, tempuser2, …).
+
+    The invite_code is intentionally kept on the record so that logout can
+    detect it and trigger account deletion.
+    """
+    load_dotenv()
+    count = db.execute(
+        select(func.count()).where(User.name.like("tempuser%"))
+    ).scalar()
+    temp_name = f"tempuser{count + 1}"
+    password_bytes = "p@ssW0rd".encode("utf-8")
+    hashed_password = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+    row = User(
+        name=temp_name,
+        create_date=datetime.date.today(),
+        password_hash=hashed_password,
+        invite_code=os.getenv("DEV-INVITE-CODE"),
+        used_code=True,
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row
+
+
 #TODO: Retured UserResponse shoud login, then remove the key from both tables.
 def add_user(new_user: UserCreate, db: Session) -> User:
     password_bytes = new_user.password1.encode("utf-8")

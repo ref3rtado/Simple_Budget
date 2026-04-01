@@ -12,6 +12,11 @@
 {% block content %}
 
 {% if new_user %}
+    {% if is_temp_user %}
+    <div class="message warning">
+        &#9888; <strong>Temporary session:</strong> This account and all its data will be permanently deleted when you log out. Nothing in this session will be saved.
+    </div>
+    {% endif %}
     {% include "fragments/welcome_card.html" %}
 {% endif %}
 
