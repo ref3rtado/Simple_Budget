@@ -1,0 +1,66 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Local Database
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.vscode
+
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+simple_budget_venv/
+sshkey/
+*.code-workspace
+Simple_Budget.code-workspace
+
+# Claude Code
+.claude/
+
+# Key management scripts and output
+sb_app/src/model/key_gen.py
+sb_app/src/model/key_list.py
+AvailableKeys.txt
+
+# Pre-deployment setup, keep requirements.txt for pip list
+*.txt
+!requirements.txt
+Simple_Budget.code-workspace
+Simple_Budget.code-workspace
