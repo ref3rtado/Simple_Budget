@@ -547,6 +547,19 @@ body.page-dashboard {
     margin-bottom: 1rem;
 }
 
+.btn-back {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.8rem;
+    background: var(--color-primary);
+    color: #fff;
+}
+
+.btn-back:hover {
+    background: var(--color-primary);
+    color: #fff;
+    text-decoration: none;
+}
+
 /* ── Surplus bar ── */
 .surplus-bar {
     display: flex;
@@ -653,8 +666,8 @@ body.page-dashboard {
 
 /* ── Column widths — shared by header and rows ── */
 .cat-col-name    { flex: 1; }
-.cat-col-amount  { width: 120px; text-align: right; }
-.cat-col-actions { width: 140px; text-align: right; }
+.cat-col-amount  { width: 140px; text-align: left; flex-shrink: 0; }
+.cat-col-actions { width: 140px; text-align: right; flex-shrink: 0; }
 
 .cat-btn-add {
     width: auto;
@@ -714,12 +727,17 @@ body.page-dashboard {
 }
 
 .cat-badge-locked {
+    /*
     font-size: 0.72rem;
     background: #e0e0e0;
     color: #555;
     border-radius: 999px;
     padding: 2px 8px;
     font-weight: 600;
+    */
+    font-size: 0.9rem;
+    line-height: 1;
+    opacity: 0.6;
 }
 
 .cat-cannot-delete {
@@ -831,6 +849,30 @@ body.page-dashboard {
     padding: 0.45rem 0.85rem;
     align-self: flex-end;
 }
+/* -- Mobile Override -- */
+
+@media (max-width: 768px) {
+    .cat-table-header {
+        padding: 0.5rem 0.6rem;
+    }
+
+    .cat-row-main {
+        padding: 0.6rem;
+    }
+
+    .cat-col-amount  { width: 80px; text-align: left; }
+    .cat-col-actions { width: 110px; }
+
+    .cat-btn-add {
+        padding: 0.3rem;
+        font-size: 0.7rem;
+    }
+
+    .cat-row-main .cat-col-amount {
+        font-size: 0.85rem;
+    }
+}
+
 /*
 ####################################################################
 ###                           REPORTS                            ###
