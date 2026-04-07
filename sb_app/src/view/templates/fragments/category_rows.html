@@ -35,7 +35,8 @@
         <span class="cat-col-name">
             {{ budget.budget_name | capitalize }}
             {% if is_overall %}
-                <span class="cat-badge-locked">locked</span>
+            <!-- Prev used 🔒 icon, but may cause confusion becuase the user can still edit amount-->
+                <span class="cat-badge-locked" title="Locked"></span>
             {% endif %}
         </span>
         <span class="cat-col-amount">${{ "%.2f"|format(budget.budget_amount) }}</span>
