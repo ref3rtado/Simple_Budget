@@ -8,48 +8,38 @@
 <section id="data-viz-section" hx-swap="outerHTML">
 
     <div id="data-viz-container" class="data-viz-container">
-        {% for budget in budgets%}
-        {% set is_overall = budget.budget_name == "overall" %} 
-        {% if is_overall %}
-        <div id="overall-budget-container" class="data-viz-child">
-            <h2 class="viz-budget-title">Overall</h2>
-            <h3 class="viz-bold-text">Amount: 
-                <!--Placeholder values, sub in existing categories-->
-                <span class="viz-dollar">$</span><span class="viz-value viz-amount-value">{{budget.budget_amount}}</span></span></h3>
-            <h3 class="viz-bold-text">Remaining:
-                <span class="viz-dollar">$</span><span class="viz-value viz-remain-value">{{budget.budget_remaining}}</span>
-            </h3>
+    {% for budget in budgets %}
+        {% if budget.budget_name == "overall" %}
+        <div class="data-viz-child viz-overall">
+            <h2 class="viz-title">Overall</h2>
+            <p class="viz-amounts">
+                <span class="viz-spent">${{ "%.2f"|format(budget.budget_amount - budget.budget_remaining) }}</span>
+                <span class="viz-sep">/</span>
+                <span class="viz-total">${{ "%.2f"|format(budget.budget_amount) }}</span>
+            </p>
+            <span class="viz-amount-value" hidden>{{ budget.budget_amount }}</span>
+            <span class="viz-remain-value" hidden>{{ budget.budget_remaining }}</span>
         </div>
         {% endif %}
-        {% endfor %}
-        <div id="sub-budget-container">
-            {% for budget in budgets%}
-            {% set is_overall = budget.budget_name == "overall" %} 
-            {% if not is_overall %}
-            <div id="sub-budget-child" class="data-viz-child"> 
-                <!--Placeholder values, sub in existing categories-->
-                <h3 class="viz-sub-budget-title">{{budget.budget_name}}
-                    <p class="viz-sub-bold-text">Amount: 
-                        <span class="viz-sub-dollar">$</span><span class="viz-sub-value viz-amount-value">{{budget.budget_amount}}</span></span>
-                    </p>
-                    <p class="viz-sub-bold-text">Remaining: 
-                        <span class="viz-sub-dollar">$</span><span class="viz-sub-value viz-remain-value">{{budget.budget_remaining}}</span></span>
-                    </p>
-                    </h3>     
+    {% endfor %}
+
+    <div class="viz-sub-grid">
+        {% for budget in budgets %}
+            {% if budget.budget_name != "overall" %}
+            <div class="data-viz-child viz-sub">
+                <h3 class="viz-title">{{ budget.budget_name | capitalize }}</h3>
+                <p class="viz-amounts">
+                    <span class="viz-spent">${{ "%.2f"|format(budget.budget_amount - budget.budget_remaining) }}</span>
+                    <span class="viz-sep">/</span>
+                    <span class="viz-total">${{ "%.2f"|format(budget.budget_amount) }}</span>
+                </p>
+                <span class="viz-amount-value" hidden>{{ budget.budget_amount }}</span>
+                <span class="viz-remain-value" hidden>{{ budget.budget_remaining }}</span>
             </div>
             {% endif %}
-            {% endfor %}
-        </div>
-
-        
-        <!--
-        <div id="data-viz-placeholder" class="data-viz-placeholder">
-            <p style="visibility: hidden;">DASHBOARD COMING SOON</p>
-        </div>
-        -->
-
- 
+        {% endfor %}
     </div>
+</div>
  
 </section>
 <script>
