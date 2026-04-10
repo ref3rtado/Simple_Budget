@@ -984,6 +984,113 @@ body.page-dashboard {
     }
 }
 
+.report-date-line {
+    text-align: right;
+    padding: 0.5rem 1rem 0.4rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.report-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.report-row:last-child {
+    border-bottom: none;
+}
+
+/* DESKTOP: line1 and line2 are siblings on the same flex row */
+.report-row-line1 {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.report-cell-cat {
+    flex: 0 0 180px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+.report-cell-cost {
+    font-size: 0.9rem;
+    font-family: monospace;
+    color: #1a1a2e;
+    width: 90px;
+    text-align: left;
+}
+
+.report-cell-date {
+    font-size: 0.85rem;
+    color: #666;
+    width: 110px;
+    text-align: left;
+}
+
+.report-row-line2 {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #666;
+    font-style: italic;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* MOBILE: stack line1 and line2 vertically */
+@media (max-width: 768px) {
+    .report-date-line {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.6rem 0.35rem;
+    }
+
+    .report-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.25rem;
+        padding: 0.6rem;
+    }
+
+    .report-row-line1 {
+        gap: 0.6rem;
+    }
+
+    .report-cell-cat {
+        flex: 1;
+        font-size: 0.9rem;
+    }
+
+    .report-cell-cost {
+        width: 75px;
+        font-size: 0.85rem;
+        text-align: right;
+    }
+
+    .report-cell-date {
+        width: 85px;
+        font-size: 0.78rem;
+        text-align: right;
+    }
+
+    .report-row-line2 {
+        font-size: 0.8rem;
+        white-space: normal;
+        overflow: visible;
+    }
+}
+
 
 /*
 ####################################################################

@@ -1,15 +1,17 @@
 {% if transactions %}
-    {% for t in transactions %}
-    <div class="cat-row">
-        <div class="cat-row-main">
-            <span class="cat-col-name">{{ budget_map.get(t.budget_id, "Overall") | capitalize }}</span>
-            <span class="cat-col-name">${{ "%.2f"|format(t.cost) }}</span>
-            <span class="cat-col-name">{{ t.description if t.description else "No Description" }}</span>
-            <span class="cat-col-name">{{ t.transaction_date }}</span>
-            <span class="cat-col-name">{{ report_date }}</span>
-        </div>
+<div class="report-date-line">REPORT DATE: {{ report_date }}</div>
+{% for t in transactions %}
+<div class="report-row">
+    <div class="report-row-line1">
+        <span class="report-cell-cat">{{ budget_map.get(t.budget_id, "Overall") | capitalize }}</span>
+        <span class="report-cell-cost">${{ "%.2f"|format(t.cost) }}</span>
+        <span class="report-cell-date">{{ t.transaction_date }}</span>
     </div>
-    {% endfor %}
+    <div class="report-row-line2">
+        {{ t.description if t.description else "No description" }}
+    </div>
+</div>
+{% endfor %}
 {% else %}
-    <div class="cat-loading">No transactions found.</div>
+<div class="cat-loading">No transactions found.</div>
 {% endif %}
