@@ -449,11 +449,11 @@ body.page-dashboard {
 }
 
 /* Row 1: Amount + Category share the row */
-.txn-row-1 .txn-amount-group { flex: 1; }
-.txn-row-1 .txn-budget-group { flex: 2; }
+.txn-row-1 .txn-amount-group { flex: 0 0 140px; }
+.txn-row-1 .txn-budget-group { flex: 0 0 220px; }
 
 /* Row 2: Description full width */
-.txn-row-2 .txn-desc-group { flex: 1; }
+.txn-row-2 .txn-desc-group { flex: 0 0 50%; }
 
 /* Row 3: Date picker left (grows), Today button right */
 .txn-row-3 .txn-date-group { flex: 1; }
@@ -462,12 +462,13 @@ body.page-dashboard {
     align-items: center;
     gap: 0.5rem;
 }
-.txn-row-3 input[type="date"] { flex: 1; }
+.txn-row-3 input[type="date"] { flex: 0 0 180px; }
 
 /* Row 4: Cancel left, ADD right */
 .txn-row-4 {
     justify-content: space-between;
     align-items: center;
+    max-width: 268px;
 }
 
 /* Shared input styling for txn form */
@@ -494,16 +495,6 @@ body.page-dashboard {
     font-size: 0.8rem;
 }
 
-/* Override vertical form-group stacking inside the row */
-
-
-/* Field width modifiers */
-
-
-
-
-/* Date sub-row: [TODAY] OR [date input] */
-
 
 .txn-date-group > label { 
     margin-bottom: 0.3rem
@@ -516,12 +507,23 @@ body.page-dashboard {
     justify-content: center;
 
 }
+
+@media (max-width: 768px) {
+    .txn-row-2 .txn-desc-group { flex: 1; }
+    .txn-row-1 .txn-amount-group { flex: 1; }
+    .txn-row-1 .txn-budget-group { flex: 2; }
+    .txn-row-3 input[type="date"] { flex: 1; }
+
+    .txn-row-4 { max-width: 100%; }
+}
+/*
 .or-text {
     font-size: 0.8rem;
     font-weight: 600;
     color: #888;
     white-space: nowrap;
 }
+*/
 
 /* B1: Red cancel (x) square */
 #btn-cancel-txn {
