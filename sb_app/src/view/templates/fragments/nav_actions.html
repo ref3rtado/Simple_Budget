@@ -9,15 +9,6 @@
  
 <nav id="nav-actions-section" class="nav-actions-column">
  
-    {# C1: Log out #}
-    <button
-        id="btn-logout"
-        class="btn-secondary"
-        hx-post="/user/logout"
-        hx-swap="none">
-        Log Out
-    </button>
- 
     {# C2: Categories page — TODO: build /categories route + template #}
     <a href="/categories" class="btn-secondary" id="link-categories">
         View/Edit Budget Categories
@@ -29,12 +20,3 @@
     </a>
  
 </nav>
- 
-<script>
-    // C1: Redirect to login after successful logout
-    document.body.addEventListener('htmx:afterRequest', function (evt) {
-        if (evt.detail.elt.id === 'btn-logout' && evt.detail.successful) {
-            window.location.href = '/';
-        }
-    });
-</script>

@@ -10,6 +10,16 @@
 {% endblock %}
 
 {% block content %}
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Budget.isSimple</h1>
+        <button
+            id="btn-logout"
+            class="btn-secondary"
+            hx-post="/user/logout"
+            hx-swap="none">
+            Log Out
+        </button>
+    </div>
 
 {% if new_user %}
     {% if is_temp_user %}
@@ -27,4 +37,14 @@
 
 {% include "fragments/add_transaction.html" %}
 
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.body.addEventListener('htmx:afterRequest', function (evt) {
+            if (evt.detail.elt.id === 'btn-logout' && evt.detail.successful) {
+                window.location.href = '/';
+            }
+        });
+    </script>
 {% endblock %}

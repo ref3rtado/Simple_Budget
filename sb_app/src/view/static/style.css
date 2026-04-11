@@ -220,6 +220,25 @@ body.page-dashboard {
     gap: 0.75rem;
 }
 
+.dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.dashboard-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0;
+    color: #1a1a2e;
+}
+
+.dashboard-header #btn-logout {
+    align-self: auto;
+    margin-bottom: 0;
+}
+
 /* ── A2: Placeholder pill overlay ── 
 .data-viz-placeholder {
     background: #ffffff;
@@ -309,6 +328,11 @@ body.page-dashboard {
 
 /* ── MOBILE OVERRIDE (≤768px) ── */
 @media (max-width: 768px) {
+
+    .dashboard-title {
+        font-size: 1.2rem;
+    }
+
     .dashboard-page {
         padding: 0.75rem;
     }
@@ -406,34 +430,80 @@ body.page-dashboard {
 }
 
 /* Single horizontal flex row for all B fields */
-.txn-form-row {
+.txn-form-grid {
     display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    gap: 0.6rem;
-    flex-wrap: nowrap;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
-/* Override vertical form-group stacking inside the row */
-.txn-form-row .form-group {
+.txn-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+}
+
+.txn-row .form-group {
     display: flex;
     flex-direction: column;
     margin-bottom: 0;
 }
 
+/* Row 1: Amount + Category share the row */
+.txn-row-1 .txn-amount-group { flex: 1; }
+.txn-row-1 .txn-budget-group { flex: 2; }
+
+/* Row 2: Description full width */
+.txn-row-2 .txn-desc-group { flex: 1; }
+
+/* Row 3: Date picker left (grows), Today button right */
+.txn-row-3 .txn-date-group { flex: 1; }
+.txn-row-3 .date-input-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.txn-row-3 input[type="date"] { flex: 1; }
+
+/* Row 4: Cancel left, ADD right */
+.txn-row-4 {
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Shared input styling for txn form */
+.txn-form-grid input[type="number"],
+.txn-form-grid input[type="text"],
+.txn-form-grid input[type="date"],
+.txn-form-grid select {
+    padding: 0.5rem 0.65rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background: #fff;
+    width: 100%;
+}
+
+.txn-form-grid input:focus,
+.txn-form-grid select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.txn-form-grid label {
+    font-size: 0.8rem;
+}
+
+/* Override vertical form-group stacking inside the row */
+
+
 /* Field width modifiers */
-.txn-amount-group  { width: 110px; flex-shrink: 0; }
-.txn-budget-group  { width: 150px; flex-shrink: 0; }
-.txn-desc-group    { flex: 1 1 0; min-width: 120px; }
-.txn-date-group    { flex-shrink: 0; }
+
+
+
 
 /* Date sub-row: [TODAY] OR [date input] */
-.txn-form-row .date-input-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.4rem;
-}
+
 
 .txn-date-group > label { 
     margin-bottom: 0.3rem
@@ -501,29 +571,6 @@ body.page-dashboard {
 }
 
 /* Input sizing scoped to the horizontal row */
-.txn-form-row input[type="number"],
-.txn-form-row input[type="text"],
-.txn-form-row input[type="date"],
-.txn-form-row select {
-    padding: 0.45rem 0.6rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    background: #fff;
-    width: 100%;
-}
-.txn-form-row input[type="number"]:focus,
-.txn-form-row input[type="text"]:focus,
-.txn-form-row input[type="date"]:focus,
-.txn-form-row select:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
-}
-
-.txn-form-row label {
-    font-size: 0.75rem;
-}
 
 #transaction-message {
     margin-bottom: 0.5rem;
@@ -1102,7 +1149,5 @@ body.page-dashboard {
     .dashboard-top {
         grid-template-columns: 1fr;
     }
-    .txn-form-row {
-        flex-wrap: wrap;
-    }
+
 }
