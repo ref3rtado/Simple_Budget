@@ -26,92 +26,88 @@
           hx-target="#data-viz-section"
           hx-swap="outerHTML">
 
-        <div class="txn-form-row">
+<div class="txn-form-grid">
 
-            {# B1: Cancel — red X square, clears all fields #}
-            <button type="button" id="btn-cancel-txn">x</button>
-
-            {# B2: Amount #}
-            <div class="form-group txn-amount-group">
-                <label for="txn-amount">Amount <span class="required">*</span></label>
-                <div class="input-prefix-wrapper">
-                    <input
-                        type="number"
-                        id="txn-amount"
-                        name="amount"
-                        min="0.01"
-                        max="99999999.99"
-                        step="0.01"
-                        placeholder="0.00"
-                        required
-                    >
-                </div>
-                <span class="field-error" id="err-cost"></span>
-            </div>
-
-            {# B3: Budget category dropdown — populated by HTMX on load.
-                 hx-get queries /user/budgets and swaps in <option> elements.
-                 The static "General/Overall" option is the fallback. #}
-            <div class="form-group txn-budget-group">
-                <label for="txn-budget">Category <span class="required">*</span></label>
-                <select
-                    id="txn-budget"
-                    name="category_id"
-                    hx-get="/categories/dropdown"
-                    hx-trigger="load"
-                    hx-target="#txn-budget"
-                    hx-swap="innerHTML"
-                    hx-params="none">
-                </select>
-                <span class="field-error" id="err-budget-name"></span>
-            </div>
-
-            {# B4: Optional description — pattern restricts special characters #}
-            <div class="form-group txn-desc-group">
-                <label for="txn-desc">Description</label>
+    {# Row 1: Amount + Category #}
+    <div class="txn-row txn-row-1">
+        <div class="form-group txn-amount-group">
+            <label for="txn-amount">Amount <span class="required">*</span></label>
+            <div class="input-prefix-wrapper">
                 <input
-                    type="text"
-                    id="txn-desc"
-                    name="description"
-                    maxlength="100"
-                    pattern="^[a-zA-Z0-9 .,'\-]*$"
-                    placeholder="Optional description"
+                    type="number"
+                    id="txn-amount"
+                    name="amount"
+                    min="0.01"
+                    max="99999999.99"
+                    step="0.01"
+                    placeholder="0.00"
+                    required
                 >
-                <span class="field-error" id="err-description"></span>
             </div>
-
-            {# B5 + B6 + B7: Date group #}
-            <div class="form-group txn-date-group">
-                <label for="txn-date">Date <span class="required">*</span></label>
-                <div class="date-input-row">
-
-                    {# B5: Today shortcut button #}
-                    <button type="button" id="btn-today" class="btn-secondary">Today</button>
-
-                    <span class="or-text">OR</span>
-
-                    {# B6: Date input — filled by B5 or B7 (browser-native calendar) #}
-                    <input
-                        type="date"
-                        id="txn-date"
-                        name="txn_date"
-                        required
-                    >
-
-                </div>
-                <span class="field-error" id="err-transaction-date"></span>
-            </div>
-
-            {# B8: DONE — disabled until B2, B3, B6 are filled #}
-            <button
-                type="submit"
-                id="btn-save-txn"
-                class="btn-primary"
-                disabled>
-                ADD
-            </button>
-
+            <span class="field-error" id="err-cost"></span>
         </div>
+
+        <div class="form-group txn-budget-group">
+            <label for="txn-budget">Category <span class="required">*</span></label>
+            <select
+                id="txn-budget"
+                name="category_id"
+                hx-get="/categories/dropdown"
+                hx-trigger="load"
+                hx-target="#txn-budget"
+                hx-swap="innerHTML"
+                hx-params="none">
+            </select>
+            <span class="field-error" id="err-budget-name"></span>
+        </div>
+    </div>
+
+    {# Row 2: Description #}
+    <div class="txn-row txn-row-2">
+        <div class="form-group txn-desc-group">
+            <label for="txn-desc">Description</label>
+            <input
+                type="text"
+                id="txn-desc"
+                name="description"
+                maxlength="100"
+                pattern="^[a-zA-Z0-9 .,'\-]*$"
+                placeholder="Optional description"
+            >
+            <span class="field-error" id="err-description"></span>
+        </div>
+    </div>
+
+    {# Row 3: Date picker left, Today button right #}
+    <div class="txn-row txn-row-3">
+        <div class="form-group txn-date-group">
+            <label for="txn-date">Date <span class="required">*</span></label>
+            <div class="date-input-row">
+                <input
+                    type="date"
+                    id="txn-date"
+                    name="txn_date"
+                    required
+                >
+                <button type="button" id="btn-today" class="btn-secondary">Today</button>
+            </div>
+            <span class="field-error" id="err-transaction-date"></span>
+        </div>
+    </div>
+
+    {# Row 4: Cancel left, ADD right #}
+    <div class="txn-row txn-row-4">
+        <button type="button" id="btn-cancel-txn">x</button>
+        <button
+            type="submit"
+            id="btn-save-txn"
+            class="btn-primary"
+            disabled>
+            ADD
+        </button>
+    </div>
+
+</div>
 
     </form>
 
@@ -170,13 +166,6 @@
             form.reset();
             saveBtn.disabled = true;
         });
-
-        // Debugging rejected request
-        document.body.addEventListener('htmx:beforeRequest', function(evt) {
-        // evt.detail.requestConfig contains the AJAX config
-            console.log("Sending JSON Request:", JSON.stringify(evt.detail.requestConfig.parameters));
-            });
-
 
         // Response handling
         document.body.addEventListener('htmx:afterRequest', function (evt) {

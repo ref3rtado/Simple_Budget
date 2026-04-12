@@ -10,45 +10,53 @@
 <div class="cat-page-header">
     <div class="cat-page-title-row">
         <h1 style="margin-bottom: 0;">Transactions</h1>
-        <a href="/dashboard" class="btn-secondary">← Dashboard</a>
+        <a href="/dashboard" class="btn-secondary btn-back">← Back</a>
     </div>
 </div>
 
 {# ── Filter bar ── #}
-<form id="report-filter-form"
-      hx-post="/report/filter"
-      hx-target="#report-rows"
-      hx-swap="innerHTML"
-      hx-trigger="submit">
+<div class="report-filter-wrapper">
+    <div class="report-action-bar">
+        <button type="button" class="btn-secondary report-filter-toggle" id="filter-toggle"
+                onclick="toggleFilterPanel()">
+            Filters ▾
+        </button>
 
-    <div class="cat-table-header" id="filter-parent-container">
-        {# TODO: Change style #}
-        {# Date filter #}
-        <div class="cat-filter-dropdown filter-container" id="date-filter-container">
-            <button type="button" class="btn-secondary filter-button" id="filter-btn-date" onclick="toggleDropdown('date-panel')">
-                Filter: Date
-            </button>
-            {# TODO: Change style #}
-            {# Drop down menu #}
-            <div id="date-panel" class="cat-checkbox-panel filter-drop-menu hidden">
-                <label class="cat-checkbox-label">
-                    <input type="radio" name="date_filter" value="7"> Last 7 Days
+        <button type="button" class="filter-clear-btn hidden" id="filter-clear-btn"
+                onclick="clearFilters()">
+            Clear
+        </button>
+
+        <button type="submit" form="report-filter-form"
+                class="btn-primary filter-generate-btn">
+            Generate
+        </button>
+    </div>
+
+    <form id="report-filter-form"
+          hx-post="/report/filter"
+          hx-target="#report-rows"
+          hx-swap="innerHTML"
+          hx-trigger="submit"
+          class="report-filter-panel hidden">
+
+        <div class="filter-section">
+            <span class="filter-section-label">Date</span>
+            <div class="filter-section-options">
+                <label class="filter-option">
+                    <input type="radio" name="date_filter" value="7"> Last 7 days
                 </label>
-                <label class="cat-checkbox-label">
-                    <input type="radio" name="date_filter" value="30"> Last 30 Days
+                <label class="filter-option">
+                    <input type="radio" name="date_filter" value="30"> Last 30 days
                 </label>
             </div>
         </div>
 
-        {# Category filter #}
-        <div class="cat-filter-dropdown filter-container" id="cat-filter-container">
-            <button type="button" class="btn-secondary filter-button" id="filter-btn-cat" onclick="toggleDropdown('cat-checkbox-panel')">
-                Filter: Category
-            </button>
-            {# Drop down menu #}
-            <div id="cat-checkbox-panel" class="cat-checkbox-panel filter-drop-menu hidden">
+        <div class="filter-section">
+            <span class="filter-section-label">Category</span>
+            <div class="filter-section-options">
                 {% for b in budgets %}
-                <label class="cat-checkbox-label">
+                <label class="filter-option">
                     <input type="checkbox" name="category_ids" value="{{ b.id }}">
                     {{ b.budget_name | capitalize }}
                 </label>
@@ -56,43 +64,27 @@
             </div>
         </div>
 
-        {# Cost filter #}
-        <div class="filter-container" id="cost-filter-container">
-            <button type="button" class="btn-secondary filter-button" id="filter-btn-cost" onclick="toggleDropdown('cost-panel')">
-                Filter: Cost
-            </button>
-            {# Drop down menu #}
-            <div id="cost-panel" class="filter-drop-menu hidden">
-                <label class="cat-checkbox-label">
-                    <input type="radio" name="cost_filter" value=">100"> Cost &gt; $100
+        <div class="filter-section">
+            <span class="filter-section-label">Cost</span>
+            <div class="filter-section-options">
+                <label class="filter-option">
+                    <input type="radio" name="cost_filter" value=">100"> Over $100
                 </label>
-                <label class="cat-checkbox-label">
-                    <input type="radio" name="cost_filter" value=">50"> Cost &gt; $50
+                <label class="filter-option">
+                    <input type="radio" name="cost_filter" value=">50"> Over $50
                 </label>
-                <label class="cat-checkbox-label">
-                    <input type="radio" name="cost_filter" value="&lt;50"> Cost &lt; $50
+                <label class="filter-option">
+                    <input type="radio" name="cost_filter" value="<50"> Under $50
                 </label>
             </div>
         </div>
-
-        <button type="submit" class="btn-secondary filter" id="btn-generate">Generate</button>
-
-        <button type="reset" class="btn-secondary"
-                onclick="setTimeout(() => closeAllDropdowns(), 0)">
-            Clear
-        </button>
-
-    </div>
-</form>
+    </form>
+</div>
 
 {# ── Transaction table ── #}
 <div class="cat-table-wrapper">
-    <div class="cat-table-header">
-        <span class="cat-col-name">Category</span>
-        <span class="cat-col-name">Cost</span>
-        <span class="cat-col-name">Description</span>
-        <span class="cat-col-name">Date</span>
-        <span class="cat-col-name">Report date</span>
+    <div class="cat-table-header report-table-header">
+        <span>Transaction</span>
     </div>
 
     <div id="report-rows"
@@ -105,21 +97,39 @@
 
 {% block scripts %}
 <script>
-    function toggleDropdown(id) {
-        const target = document.getElementById(id);
-        const isOpen = !target.classList.contains('hidden');
-        closeAllDropdowns();
-        if (!isOpen) target.classList.remove('hidden');
+    function toggleFilterPanel() {
+        document.getElementById('report-filter-form').classList.toggle('hidden');
     }
 
-    function closeAllDropdowns() {
-        document.querySelectorAll('.filter-drop-menu').forEach(p => p.classList.add('hidden'));
+    function closeFilterPanel() {
+        document.getElementById('report-filter-form').classList.add('hidden');
     }
+
+    function updateClearBtn() {
+        const form = document.getElementById('report-filter-form');
+        const hasSelection = form.querySelector('input[type="radio"]:checked, input[type="checkbox"]:checked');
+        document.getElementById('filter-clear-btn').classList.toggle('hidden', !hasSelection);
+    }
+
+    function clearFilters() {
+        document.getElementById('report-filter-form').reset();
+        updateClearBtn();
+    }
+
+    // Close panel after successful generate
+    document.body.addEventListener('htmx:afterRequest', function (evt) {
+        if (evt.detail.elt.id === 'report-filter-form' && evt.detail.successful) {
+            closeFilterPanel();
+        }
+    });
+
+    // Update clear button whenever a selection changes
+    document.getElementById('report-filter-form').addEventListener('change', updateClearBtn);
 
     // Close on outside click
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.filter-container')) {
-            closeAllDropdowns();
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.report-filter-wrapper')) {
+            closeFilterPanel();
         }
     });
 </script>

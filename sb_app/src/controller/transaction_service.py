@@ -12,7 +12,6 @@ templates = Jinja2Templates(directory="src/view/templates/")
 
 
 def _get_user_id(user_id: str = Cookie(default=None)) -> int:
-    print(f"Cookie value: {user_id}")
     if not user_id:
         raise HTTPException(status_code=401, detail="Not authenticated.")
     return int(user_id)
@@ -31,17 +30,12 @@ async def add_transaction(
     uid: int = Depends(_get_user_id),
     db: Session=Depends(get_db)
     ):
-    print(f"UID: {uid}")
-    print(f"Transaction: {transaction}")
     transaction.user = uid
-    print("Finished /transactions/add")
     crud.add_transaction(transaction, db)
     return _refresh_dash(request, uid, db)
 
 
 @router.post("/test-post")
 async def test_post(request: Request):
-    print("TEST HIT")
     body = await request.json()
-    print(f"Body: {body}")
     return {"ok": True}
