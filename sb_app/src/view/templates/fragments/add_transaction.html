@@ -167,13 +167,6 @@
             saveBtn.disabled = true;
         });
 
-        // Debugging rejected request
-        document.body.addEventListener('htmx:beforeRequest', function(evt) {
-        // evt.detail.requestConfig contains the AJAX config
-            console.log("Sending JSON Request:", JSON.stringify(evt.detail.requestConfig.parameters));
-            });
-
-
         // Response handling
         document.body.addEventListener('htmx:afterRequest', function (evt) {
             if (evt.detail.elt.id !== 'transaction-form') return;
