@@ -134,6 +134,52 @@ input:disabled {
     background: var(--color-primary);
 }
 
+/* ── Shared secondary button (used in nav + form) ── */
+.btn-secondary {
+    padding: 0.55rem 1.1rem;
+    background: #fff;
+    color: var(--color-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 2px solid var(--color-primary);
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-secondary:hover {
+    background: var(--color-primary);
+    color: #fff;
+    text-decoration: none;
+}
+
+
+
+/*
+####################################################################
+###                     DASHBOARD DISPLAY                        ###
+####################################################################
+*/
+
+/*  DASHBOARD LAYOUT */
+body.page-dashboard {
+    align-items: flex-start;
+    padding: 1.5rem;
+}
+
+
+/* ── Dashboard page wrapper (replaces .card) ── */
+.dashboard-page {
+    width: 100%;
+    max-width: 1200px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+}
+
 /* ── Feedback messages ── */
 .message {
     padding: 0.75rem 1rem;
@@ -159,49 +205,7 @@ input:disabled {
     display: none;
 }
 
-/*  DASHBOARD LAYOUT */
 
-body.page-dashboard {
-    align-items: flex-start;
-    padding: 1.5rem;
-}
-
-/* ── Shared secondary button (used in nav + form) ── */
-.btn-secondary {
-    padding: 0.55rem 1.1rem;
-    background: #fff;
-    color: var(--color-primary);
-    font-size: 0.9rem;
-    font-weight: 600;
-    border: 2px solid var(--color-primary);
-    border-radius: 6px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    transition: background 0.2s, color 0.2s;
-}
-
-/* EXAM REQUIREMENT: Responsive UI/UX | Cursor hover changes color */
-.btn-secondary:hover {
-    background: var(--color-primary);
-    color: #fff;
-    text-decoration: none;
-}
-
-/* ── Dashboard page wrapper (replaces .card) ── */
-.dashboard-page {
-    width: 100%;
-    max-width: 1200px;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem;
-}
-/*
-####################################################################
-###                     DASHBOARD DISPLAY                        ###
-####################################################################
-*/
 /* ── Two-column top: A (data viz) left, C (nav) right ── */
 .dashboard-top {
     display: grid;
@@ -239,20 +243,6 @@ body.page-dashboard {
     margin-bottom: 0;
 }
 
-/* ── A2: Placeholder pill overlay ── 
-.data-viz-placeholder {
-    background: #ffffff;
-    border-radius: 999px;
-    padding: 0.6rem 1.8rem;
-    font-weight: 700;
-    font-size: 0.95rem;
-    letter-spacing: 0.04em;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-    color: #1a1a2e;
-    pointer-events: none;
-    visibility: hidden;
-}
-*/
 /* ── A1: Data viz container (DESKTOP DEFAULT) ── */
 .data-viz-container {
     background: #f8f9fa;
@@ -402,7 +392,6 @@ body.page-dashboard {
     transition: background 0.2s, color 0.2s;
 }
 
-/* EXAM REQUIREMENT: Responsive UI/UX | Cursor hover changes color */
 #btn-logout:hover {
     background: #af2d2d;
     color: #fff;
@@ -516,14 +505,6 @@ body.page-dashboard {
 
     .txn-row-4 { max-width: 100%; }
 }
-/*
-.or-text {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #888;
-    white-space: nowrap;
-}
-*/
 
 /* B1: Red cancel (x) square */
 #btn-cancel-txn {
@@ -565,7 +546,6 @@ body.page-dashboard {
     transition: background 0.2s;
 }
 
-/* EXAM REQUIREMENT: Responsive UI/UX | Cursor hover changes color, and clearly indicates when a button is disabled */
 #btn-save-txn:hover:not(:disabled) { background: #16a34a; }
 #btn-save-txn:disabled {
     background: #86efac;
@@ -778,14 +758,6 @@ body.page-dashboard {
 }
 
 .cat-badge-locked {
-    /*
-    font-size: 0.72rem;
-    background: #e0e0e0;
-    color: #555;
-    border-radius: 999px;
-    padding: 2px 8px;
-    font-weight: 600;
-    */
     font-size: 0.9rem;
     line-height: 1;
     opacity: 0.6;
@@ -923,6 +895,7 @@ body.page-dashboard {
         font-size: 0.85rem;
     }
 }
+
 
 /*
 ####################################################################
