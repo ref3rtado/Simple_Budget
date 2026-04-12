@@ -93,7 +93,6 @@ def login_user(user: UserLogin, db: Session) -> User:
         password_bytes,
         db_user.password_hash.encode('utf-8')
     ):
-        print("User found")
         if db_user.invite_code and db_user.used_code:
             remove_code(db_user, db)
             db_user.invite_code = None
@@ -251,7 +250,6 @@ def check_invite_code(invite_key: KeyValidate, db: Session) -> InviteCode:
             InviteCode.invite_code == invite_key.invite_key)
     ).scalar_one_or_none()
     if result:
-        print(f"Invite code found: {result}")
         return KeyResponse(Key=result, isValid=True)
     return KeyResponse(invite_key=None, isValid=False)
 
@@ -262,7 +260,6 @@ def remove_code(user: User, db: Session) -> None:
             InviteCode.invite_code == user.invite_code)
     ).scalar_one()
     if row_to_delete.invite_code != os.getenv("DEV-INVITE-CODE"):
-        print("User using dev invite code, skipping delete.")
         db.delete(row_to_delete)
     user.invite_code = None
 
