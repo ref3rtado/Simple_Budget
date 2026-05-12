@@ -6,10 +6,10 @@ Future updates will come, but focus is set on the professional life at the momen
 
 
 RECENT CHANGE:
--Dynamic presentation for mobile devices
+- Dynamic presentation for mobile devices <br>
 
 FUTURE PLANS
--Implement account recovery options, without the need for personal information.
--Establish a balance for application usage and hosting costs
--Implement a queue that allows users to sign up without personally needing to contact me for an invite code (dependent on cost analysis)
--Create automatic database rotation for weekly/monthly/quarterly budgets. Optionally allow users to download a flattened report of previous financial periods for a limited time.
+- Implement account recovery options, without the need for personal information. <br>
+- Establish a balance for application usage and hosting costs <br>
+- Implement a queue that allows users to sign up without personally needing to contact me for an invite code (dependent on cost analysis) <br>
+- Create automatic database rotation for weekly/monthly/quarterly budgets. Optionally allow users to download a flattened report of previous financial periods for a limited time.<br>
