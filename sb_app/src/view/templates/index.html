@@ -43,6 +43,11 @@
 
         <button type="submit" class="btn-primary">Log In</button>
     </form>
+    <hr>
+    <button id="temp-account-button" class="btn-primary"
+            hx-post="/user/create_temp_user">Preview App</button>
+    
+    <p><br>Try out the app; All data deleted at session end.</p>
 
     <hr>
     <p>New user with an invite code? <a href="/new_user">Create new account</a></p>
