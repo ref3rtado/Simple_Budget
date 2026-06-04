@@ -1,6 +1,7 @@
 :root {
     /* General */
     --color-primary: #4f46e5;
+    --color-secondary: #a699e2;
     --deep-bg-color: #f0f2f5;
     --text-quiet-color: #999;
     --text-p-color: #555;
@@ -129,7 +130,12 @@ input:disabled {
     transition: background 0.2s;
 }
 
-/* EXAM REQUIREMENT: Responsive UI/UX | Cursor hover changes color */
+#temp-account-button {
+    background: var(--color-secondary);
+    color: var(--deep-bg-color);
+}
+
+
 .btn-primary:hover {
     background: var(--color-primary);
 }

@@ -44,15 +44,15 @@ def check_invite(key: KeyValidate, response: Response, db: Session = Depends(get
     return result
 
 
-@router.get("/create_temp_user")
-def create_temp_user(db: Session = Depends(get_db)):
+@router.post("/create_temp_user")
+def create_temp_user(response: Response, db: Session = Depends(get_db)):
     """Auto-create a temporary demo account and redirect straight to the dashboard."""
     user = crud.add_temp_user(db)
     default_budget = BudgetInit(user_id=user.id)
     crud.add_budget(default_budget, db)
-    redirect = RedirectResponse(url="/dashboard0", status_code=302)
-    redirect.set_cookie(key="user_id", value=str(user.id), httponly=True)
-    return redirect
+    response.set_cookie(key="user_id", value=str(user.id), httponly=True)
+    response.headers["HX-Redirect"] = "/dashboard0"
+    return None
 
 @router.post("/login", response_model=UserResponse)
 def login_user(user: UserLogin, response: Response, db: Session = Depends(get_db)):
