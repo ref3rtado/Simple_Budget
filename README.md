@@ -7,6 +7,7 @@ Future updates will come, but focus is set on the professional life at the momen
 
 RECENT CHANGE:
 - Dynamic presentation for mobile devices <br>
+- Add a button on login page to allow users to create temporary session in order to preview the app, instead of neededing a specific invite code.
 
 FUTURE PLANS
 - Implement account recovery options, without the need for personal information. <br>
