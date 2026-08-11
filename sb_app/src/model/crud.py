@@ -82,8 +82,6 @@ def add_user(new_user: UserCreate, db: Session) -> User:
     return row
 
 
-#NOTE: remove_code won't remove dev key.
-#TODO: Implement the temp account functionality (Not needed for exam)
 def login_user(user: UserLogin, db: Session) -> User:
     password_bytes = user.password.encode("utf-8")
     db_user = db.execute(

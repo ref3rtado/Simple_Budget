@@ -32,11 +32,6 @@ class UserBase(BaseModel):
         description="If used invite code, temporarily store."
     )
 
-    """
-    REQUIREMENT: Encapsulation.
-    Python doesn't have native private componenets, but the pydantic lirbary
-    can enforce it with PrivateAttr
-    """
     _is_temp_user: bool = PrivateAttr(default=False)
     
     def set_is_temp(self, invite_key: str):
@@ -62,7 +57,6 @@ class UserCreate(UserBase):
     password2: str
     
     """
-    REQUIREMENT: Validation.
     Server-side enforcement of input validation when creating an account.
     """
 

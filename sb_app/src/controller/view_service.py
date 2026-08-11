@@ -14,10 +14,8 @@ router = APIRouter(tags=["views"])
 templates = Jinja2Templates(directory="src/view/templates")
 
 
-# EXAM REQUIREMENT: Validation.
-# This dependency forces the user the either create an account or login,
-# making them interact with the forms that include input validation.
-def require_auth(user_id: str = Cookie(default=None)):
+def require_auth(request: Request):
+    user_id = request.session.get("user_id")
     if not user_id:
         return RedirectResponse(url="/", status_code=302)
 
@@ -32,7 +30,6 @@ def new_user_page(request: Request):
     return templates.TemplateResponse({"request": request}, "new_user.html")
 
 
-# EXAM REQUIREMENT: Validation.
 # The injected depenency checks if user previously authorized. If they manually
 # entered {url..}/dashboard, it will redirect to the login page.
 @router.get("/dashboard0", response_class=HTMLResponse)
@@ -40,11 +37,11 @@ def get_new_dashboard(
     request: Request,
     auth=Depends(require_auth),
     db: Session = Depends(get_db),
-    user_id: str = Cookie(default=None)
 ):
     if isinstance(auth, RedirectResponse):
         return auth
     is_temp_user = False
+    user_id: str = request.session.get("user_id")
     if user_id:
         user = crud.get_user_by_id(int(user_id), db)
         if user and user.invite_code == os.getenv("DEV-INVITE-CODE"):
@@ -58,10 +55,10 @@ def get_new_dashboard(
 def get_dashboard(request: Request,
     auth=Depends(require_auth),
     db: Session = Depends(get_db),
-    user_id: str = Cookie(default=None)
 ):
     if isinstance(auth, RedirectResponse):
         return auth
+    user_id: str = request.session.get("user_id")
     budgets = crud.get_budgets(int(user_id), db)
     return templates.TemplateResponse(
         "dashboard.html",
@@ -73,10 +70,10 @@ def get_dashboard(request: Request,
 def categories_page(
     request: Request,
     auth=Depends(require_auth),
-    user_id: str = Cookie(default=None)
 ):
     if isinstance(auth, RedirectResponse):
         return auth
+    user_id: str = request.session.get("user_id")
     return templates.TemplateResponse(
         "categories.html",
         {"request": request, "user_id": user_id}
